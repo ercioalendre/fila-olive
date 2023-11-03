@@ -1,26 +1,44 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter as Router, Route, Routes, useParams } from 'react-router-dom';
+import { OperatorWebSocketProvider } from './WsOperatorContext';
+import { UserWebSocketProvider } from './WsUserContext';
+import UserWaitingRoom from './UserWaitingRoom';
+import OperatorManagementRoom from './OperatorManagementRoom';
 
-function App() {
+const OperatorRoom: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <OperatorWebSocketProvider operatorId={id}>
+      <div className="App">
+        <OperatorManagementRoom />
+      </div>
+    </OperatorWebSocketProvider>
   );
-}
+};
+
+const UserRoom: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+
+  return (
+    <UserWebSocketProvider userId={id}>
+      <div className="App">
+        <UserWaitingRoom />
+      </div>
+    </UserWebSocketProvider>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/user/:id" element={<UserRoom />} />
+        <Route path="/operator/:id" element={<OperatorRoom />} />
+      </Routes>
+    </Router>
+  );
+};
 
 export default App;
